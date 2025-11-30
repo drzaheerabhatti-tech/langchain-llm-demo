@@ -1,8 +1,3 @@
----
-
-# ✅ **FINAL COMPLETE README.md (ONE FILE, ONE CODE BLOCK)**
-
-````md
 # LangChain LLM Demo
 
 ![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
