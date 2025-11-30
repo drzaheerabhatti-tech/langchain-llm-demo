@@ -30,7 +30,7 @@ embeddings = OpenAIEmbeddings(model="text-embedding-3-small")
 vectorstore = FAISS.from_texts(raw_docs, embedding=embeddings)
 
 # 3. LLM client
-llm = ChatOpenAI(model_name="gpt-4o-mini", temperature=0.2)
+llm = ChatOpenAI(model="gpt-4o-mini", temperature=0.2)
 
 
 def answer_question(question: str) -> str:
