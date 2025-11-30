@@ -1,12 +1,14 @@
 import sys
+from typing import Optional
+
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
+from langchain_core.messages import SystemMessage, HumanMessage, AIMessage
 
-# Load environment variables
+# Load environment variables from .env
 load_dotenv()
 
-
-# Pricing table
+# Pricing table for cost estimation
 PRICES = {
     "gpt-4o-mini": {
         "input": 0.15 / 1_000_000,
@@ -15,7 +17,7 @@ PRICES = {
 }
 
 
-def estimate_cost(model, usage):
+def estimate_cost(model: str, usage: dict) -> float:
     """Estimate $ cost based on token usage."""
     t_in = usage["input_tokens"]
     t_out = usage["output_tokens"]
@@ -23,36 +25,84 @@ def estimate_cost(model, usage):
     return t_in * p["input"] + t_out * p["output"]
 
 
-def run_llm(prompt: str):
-    """Send prompt to the LLM and print everything nicely."""
+def chat_loop(initial_prompt: Optional[str] = None) -> None:
+    """
+    Run an interactive chat loop with in-session memory.
+
+    - Keeps conversation history in memory while the script runs
+    - Type 'exit' or 'quit' to end the chat
+    """
+
     llm = ChatOpenAI(
         model="gpt-4o-mini",
         temperature=0.7,
-        n=1,
+        max_completion_tokens = 500,
         verbose=False,
     )
 
-    print("\n📨 Sending prompt...\n")
-    response = llm.invoke(prompt)
+    # Conversation history (memory)
+    history = [
+        SystemMessage(
+            content=(
+                "You are a friendly, concise personal assistant. "
+                "You are chatting with Zaheer. Keep answers short and clear."
+            )
+        )
+    ]
 
-    print("🧠 MODEL REPLY:")
-    print(response.content)
-    print("\n📊 USAGE:", response.usage_metadata)
+    print("💬 Mini Chatbot with Memory (gpt-4o-mini)")
+    print("Type your message and press Enter.")
+    print("Type 'exit' or 'quit' to end the chat.\n")
 
-    cost = estimate_cost("gpt-4o-mini", response.usage_metadata)
-    print(f"💰 ESTIMATED COST: ${cost:.8f}\n")
+    # If the user passed a first prompt via CLI, handle it before the loop
+    if initial_prompt:
+        _handle_turn(initial_prompt, llm, history)
+
+    # Main interactive loop
+    while True:
+        try:
+            user_input = input("You: ").strip()
+        except (EOFError, KeyboardInterrupt):
+            print("\n👋 Goodbye!")
+            break
+
+        if not user_input:
+            continue
+
+        if user_input.lower() in {"exit", "quit"}:
+            print("👋 Goodbye!")
+            break
+
+        _handle_turn(user_input, llm, history)
+
+
+def _handle_turn(user_input: str, llm: ChatOpenAI, history: list) -> None:
+    """Handle a single user → model turn with memory + cost printing."""
+    # Add the user's message to history
+    history.append(HumanMessage(content=user_input))
+
+    # Send full history to the model
+    response = llm.invoke(history)
+
+    # Print reply
+    print(f"Assistant: {response.content}\n")
+
+    # Add assistant reply to history
+    history.append(AIMessage(content=response.content))
+
+    # Optional: usage + cost per turn
+    if getattr(response, "usage_metadata", None):
+        usage = response.usage_metadata
+        cost = estimate_cost("gpt-4o-mini", usage)
+        print(f"   🔎 usage: {usage}")
+        print(f"   💰 cost for this reply: ${cost:.8f}\n")
 
 
 if __name__ == "__main__":
-    # Case 1: User passes text as a command-line argument
+    # Optional initial prompt via CLI:
+    # python llm_prompt.py "Explain Solace PubSub+ in one sentence"
+    first_prompt: Optional[str] = None
     if len(sys.argv) > 1:
-        prompt = " ".join(sys.argv[1:])
-    else:
-        # Case 2: Interactive input mode
-        prompt = input("Enter your prompt: ").strip()
+        first_prompt = " ".join(sys.argv[1:]).strip() or None
 
-    if not prompt:
-        print("Error: Prompt cannot be empty.")
-        sys.exit(1)
-
-    run_llm(prompt)
+    chat_loop(initial_prompt=first_prompt)
