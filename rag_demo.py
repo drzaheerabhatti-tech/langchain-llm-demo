@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI, OpenAIEmbeddings
 from langchain_community.vectorstores import FAISS
 
+
 load_dotenv()
 
 # 1. Load markdown files as documents
@@ -50,7 +51,8 @@ If the answer is not in the context, say you don't know.
 """
 
     response = llm.invoke(prompt)
-    return response.content
+    # type: ignore
+    return str(response.content)
 
 
 if __name__ == "__main__":
