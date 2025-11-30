@@ -284,17 +284,3 @@ pip install langchain-openai langchain-community faiss-cpu
 
 ---
 
-## 🧩 Where to go next
-
-Once the RAG demo works, you can:
-
-- Connect it to the **chatbot** for long-term memory  
-- Load all your Solace docs or observability notes  
-- Build a full personal assistant with your own knowledge base  
-- Move from FAISS to a hosted vector DB (Pinecone, Milvus, Weaviate, Chroma Cloud)
-
-Let me know if you want to build:
-- a **chatbot with RAG**,  
-- a **document ingestion pipeline**,  
-- or a **full FastAPI/Streamlit UI** for querying your knowledge.
-
