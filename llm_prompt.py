@@ -1,5 +1,5 @@
 import sys
-from typing import Optional
+from typing import Optional, Dict
 
 from dotenv import load_dotenv
 from langchain_openai import ChatOpenAI
@@ -17,7 +17,7 @@ PRICES = {
 }
 
 
-def estimate_cost(model: str, usage: dict) -> float:
+def estimate_cost(model: str, usage: Dict[str, int]) -> float:
     """Estimate $ cost based on token usage."""
     t_in = usage["input_tokens"]
     t_out = usage["output_tokens"]
@@ -29,18 +29,18 @@ def chat_loop(initial_prompt: Optional[str] = None) -> None:
     """
     Run an interactive chat loop with in-session memory.
 
-    - Keeps conversation history in memory while the script runs
-    - Type 'exit' or 'quit' to end the chat
+    - Keeps conversation history while script runs
+    - Type 'exit' or 'quit' to end
     """
 
     llm = ChatOpenAI(
-        model="gpt-4o-mini",
+        model="gpt-4o-mini", 
         temperature=0.7,
-        max_completion_tokens = 500,
+        max_completion_tokens=500,             
         verbose=False,
     )
 
-    # Conversation history (memory)
+    # Conversation history
     history = [
         SystemMessage(
             content=(
@@ -54,11 +54,9 @@ def chat_loop(initial_prompt: Optional[str] = None) -> None:
     print("Type your message and press Enter.")
     print("Type 'exit' or 'quit' to end the chat.\n")
 
-    # If the user passed a first prompt via CLI, handle it before the loop
     if initial_prompt:
         _handle_turn(initial_prompt, llm, history)
 
-    # Main interactive loop
     while True:
         try:
             user_input = input("You: ").strip()
@@ -78,30 +76,25 @@ def chat_loop(initial_prompt: Optional[str] = None) -> None:
 
 def _handle_turn(user_input: str, llm: ChatOpenAI, history: list) -> None:
     """Handle a single user → model turn with memory + cost printing."""
-    # Add the user's message to history
+
     history.append(HumanMessage(content=user_input))
 
-    # Send full history to the model
     response = llm.invoke(history)
 
-    # Print reply
     print(f"Assistant: {response.content}\n")
 
-    # Add assistant reply to history
     history.append(AIMessage(content=response.content))
 
-    # Optional: usage + cost per turn
     if getattr(response, "usage_metadata", None):
-        usage = response.usage_metadata
+        usage = response.usage_metadata  # type: Dict[str, int]
         cost = estimate_cost("gpt-4o-mini", usage)
         print(f"   🔎 usage: {usage}")
         print(f"   💰 cost for this reply: ${cost:.8f}\n")
 
 
 if __name__ == "__main__":
-    # Optional initial prompt via CLI:
-    # python llm_prompt.py "Explain Solace PubSub+ in one sentence"
     first_prompt: Optional[str] = None
+
     if len(sys.argv) > 1:
         first_prompt = " ".join(sys.argv[1:]).strip() or None
 
