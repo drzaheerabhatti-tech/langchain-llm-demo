@@ -1,19 +1,17 @@
 from dotenv import load_dotenv
-load_dotenv()
 from langchain_openai import ChatOpenAI
 
+load_dotenv()
+
 llm = ChatOpenAI(
-    model_name="gpt-4o-mini",
-    temperature=0.7,
-    max_tokens=500,
-    verbose=True,
+   model="gpt-4o-mini",
+   temperature=0.7,
+   max_completion_tokens=500,
+   verbose=True,
 )
-
-
 
 response = llm.invoke("Hi, how are you?")
 print(response.content)
-
 
 PRICES = {
     "gpt-4o-mini": {"input": 0.15 / 1_000_000, "output": 0.60 / 1_000_000},
