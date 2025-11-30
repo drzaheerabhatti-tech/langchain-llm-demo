@@ -1,9 +1,3 @@
-Got you — GitHub sometimes **collapses long messages** and makes it *look* split.
-
-Here is the **entire README.md again**, as **one single monolithic Markdown file**, inside **ONE code block**, with **zero breaks**, **no commentary**, and **no interruptions**.
-
-Copy/paste this **exact block** into `README.md`:
-
 ---
 
 # ✅ **FINAL COMPLETE README.md (ONE FILE, ONE CODE BLOCK)**
@@ -378,8 +372,6 @@ This project helps you learn:
 * How to build a **chatbot with memory**
 * How to build a **RAG system**
 * How to structure a clean Python + Git project
-
-Feel free to fork, extend, and build your own Solace/Observability/Upthink assistant on top of this!
 
 ```
 
