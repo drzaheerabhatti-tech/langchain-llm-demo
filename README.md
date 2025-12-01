@@ -41,7 +41,7 @@ Make sure to check:
 ```bash
 git clone https://github.com/drzaheerabhatti-tech/langchain-llm-demo.git
 cd langchain-llm-demo
-````
+```
 
 ---
 
@@ -51,7 +51,7 @@ cd langchain-llm-demo
 
 ```bash
 python -m venv venv
-.\venv\Scripts\activate
+.env\Scriptsctivate
 ```
 
 #### macOS / Linux:
@@ -63,7 +63,7 @@ source venv/bin/activate
 
 When active, your terminal will show:
 
-```text
+```
 (venv)
 ```
 
@@ -81,16 +81,16 @@ pip install -r requirements.txt
 
 #### 5.1 Sign in to OpenAI
 
-[https://platform.openai.com/](https://platform.openai.com/)
+https://platform.openai.com/
 
 #### 5.2 Create a secret API key
 
-Go to:
+Go to:  
 **Dashboard → API Keys → Create new secret key**
 
-Copy your key:
+Copy your key, for example:
 
-```text
+```
 sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 ```
 
@@ -98,29 +98,15 @@ sk-xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
 
 #### 5.3 Create a `.env` file
 
-In the project root, create a file named:
-
-```text
-.env
-```
-
-Add your key:
-
 ```env
 OPENAI_API_KEY=sk-your-real-key-here
 ```
 
-`.env` is **ignored** by Git (via `.gitignore`).
+Git ignores this file automatically.
 
 ---
 
 ## 6. Basic LLM Demo (`llm.py`)
-
-This script sends a **fixed prompt** to the model and shows:
-
-* The reply
-* Token usage
-* Estimated cost
 
 Run:
 
@@ -130,37 +116,26 @@ python llm.py
 
 Example output:
 
-```text
+```
 REPLY: Solace PubSub+ is a high-performance event streaming and messaging platform.
 USAGE: {'input_tokens': 12, 'output_tokens': 16, 'total_tokens': 28}
 Estimated cost for this call: $0.00001234
 ```
 
-This is the minimal, “hello world” example.
-
 ---
 
 # 💬 Chatbot with In-Session Memory (`llm_prompt.py`)
 
-`llm_prompt.py` is a **mini personal chatbot** that remembers what you say during the session.
+A simple chatbot that remembers your conversation *during the session*:
 
-* Maintains a conversation history
-* Uses `SystemMessage`, `HumanMessage`, `AIMessage`
-* Shows usage + estimated cost per reply
-* Lets you chat until you type `exit` / `quit`
-* Allows an optional *first prompt* via command line
+- Tracks history
+- Uses `SystemMessage`, `HumanMessage`, `AIMessage`
+- Shows token usage + cost
+- Runs until you type `exit` or `quit`
 
 ---
 
 ## ▶️ Run the chatbot
-
-Activate venv if needed:
-
-```bash
-.\venv\Scripts\activate
-```
-
-Then:
 
 ```bash
 python llm_prompt.py
@@ -168,7 +143,7 @@ python llm_prompt.py
 
 You’ll see:
 
-```text
+```
 💬 Mini Chatbot with Memory (gpt-4o-mini)
 Type your message and press Enter.
 Type 'exit' or 'quit' to end the chat.
@@ -178,15 +153,15 @@ You:
 
 Example:
 
-```text
+```
 You: Hi, who are you?
 Assistant: I'm your friendly AI assistant, here to help with questions and ideas.
 
-   🔎 usage: {'input_tokens': 32, 'output_tokens': 27}
+   🔎 usage: { ... }
    💰 cost for this reply: $0.0000xxxx
 ```
 
-### Optional: start with a one-off prompt
+### Optional: provide a starting prompt
 
 ```bash
 python llm_prompt.py "Explain TLS in simple terms"
@@ -198,33 +173,31 @@ python llm_prompt.py "Explain TLS in simple terms"
 
 ```mermaid
 flowchart TD
-    U[User] -->|messages| H[Conversation History]
-    H -->|full history| LLM[ChatOpenAI (gpt-4o-mini)]
+    U[User] -- messages --> H[Conversation History]
+    H -- full history --> LLM[ChatOpenAI gpt-4o-mini]
     LLM --> R[AI Reply]
-    R -->|append| H
+    R -- append --> H
     R --> U
 ```
 
-* The **history list** grows with each turn.
-* The model receives the *entire* conversation so far.
-* Memory resets when the script ends.
+- The **history list** grows with each turn.  
+- The model receives the **entire conversation so far**.  
+- Memory resets when the script ends.
 
 ---
 
 # 📚 Retrieval-Augmented Generation (RAG) Demo (`rag_demo.py`)
 
-This demo shows how to answer questions based on **your own notes**, not just the LLM.
+This demo performs:
 
-It performs:
+- Document loading
+- Text chunking
+- Embedding using `OpenAIEmbeddings`
+- FAISS vector storage
+- Semantic retrieval
+- Grounded answering
 
-* File loading
-* Text chunking
-* Embedding with `OpenAIEmbeddings`
-* Vector storage in **FAISS**
-* Semantic retrieval
-* Answering with grounded context
-
-Perfect for creating a “Chat with your notes” assistant.
+Perfect for “Chat with your notes”.
 
 ---
 
@@ -234,17 +207,7 @@ Perfect for creating a “Chat with your notes” assistant.
 python rag_demo.py
 ```
 
-You will see:
-
-```text
-RAG demo over your markdown notes.
-Ask questions about Python or LangChain concepts.
-Type 'exit' to quit.
-
-Question (or 'exit'):
-```
-
-Example queries:
+Examples:
 
 ```
 What is LangChain?
@@ -256,12 +219,12 @@ What does load_dotenv() do?
 
 ## 🗂️ Documents used by RAG
 
-By default, the demo loads:
+```
+PYTHON_CONCEPTS.md
+LANGCHAIN_CONCEPTS.md
+```
 
-* `PYTHON_CONCEPTS.md`
-* `LANGCHAIN_CONCEPTS.md`
-
-You can add more by editing:
+You can add more in:
 
 ```python
 markdown_files = ["PYTHON_CONCEPTS.md", "LANGCHAIN_CONCEPTS.md"]
@@ -290,70 +253,42 @@ flowchart TD
 
 ---
 
-## 🔧 Extra dependencies for RAG
-
-These are already included in `requirements.txt`, but listed for clarity:
-
-```bash
-pip install langchain-openai langchain-community faiss-cpu
-```
-
----
-
 # 📂 Project Structure
 
 ```
 langchain-llm-demo/
 │
-├── llm.py                # Basic fixed-prompt example
-├── llm_prompt.py         # Chatbot with in-session memory
-├── rag_demo.py           # RAG demo using your markdown notes
+├── llm.py
+├── llm_prompt.py
+├── rag_demo.py
 │
-├── PYTHON_CONCEPTS.md    # Python explanations for beginners
-├── LANGCHAIN_CONCEPTS.md # LangChain explanations for beginners
+├── PYTHON_CONCEPTS.md
+├── LANGCHAIN_CONCEPTS.md
 │
-├── requirements.txt      # Dependencies
-├── README.md             # This file
-├── .gitignore            # Excludes venv + .env
-└── venv/                 # Virtual environment (ignored by Git)
+├── requirements.txt
+├── README.md
+├── .gitignore
+└── venv/
 ```
 
 ---
 
 # 📘 Learning Resources
 
-* **Python Concepts** → `PYTHON_CONCEPTS.md`
-* **LangChain Concepts** → `LANGCHAIN_CONCEPTS.md`
-* OpenAI API → [https://platform.openai.com/docs](https://platform.openai.com/docs)
-* LangChain Docs → [https://python.langchain.com/](https://python.langchain.com/)
+- `PYTHON_CONCEPTS.md`
+- `LANGCHAIN_CONCEPTS.md`
+- OpenAI API Docs  
+- LangChain Docs
 
 ---
 
 # 🌱 Next Steps (Suggested Enhancements)
 
-### 🚀 Combine Chatbot + RAG
-
-A single assistant that:
-
-* remembers conversation
-* retrieves knowledge
-* answers from your documents
-
-### 💾 Persistent Memory
-
-Save chat history between sessions.
-
-### 🌐 Add a Web UI
-
-Streamlit or FastAPI-based chatbot.
-
-### 📊 Observability
-
-Log token usage, latency, prompt structure.
-
-### 🐳 Docker Support
-
-Add a `Dockerfile` to containerize your assistant.
+### 🚀 Combine Chatbot + RAG  
+### 💾 Persistent Memory  
+### 🌐 Web UI (Streamlit / FastAPI)  
+### 📊 Observability (tokens, latency, logs)  
+### 🐳 Docker Support  
 
 ---
 
@@ -361,13 +296,9 @@ Add a `Dockerfile` to containerize your assistant.
 
 This project helps you learn:
 
-* How to call LLMs with LangChain
-* How to handle environment variables
-* How to estimate token cost
-* How to build a **chatbot with memory**
-* How to build a **RAG system**
-* How to structure a clean Python + Git project
-
-```
-
----
+- How to call LLMs with LangChain  
+- How to manage API keys securely  
+- How to estimate token cost  
+- How to build a chatbot with memory  
+- How to build a RAG system  
+- How to structure a clean Python project  
