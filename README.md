@@ -51,7 +51,7 @@ cd langchain-llm-demo
 
 ```bash
 python -m venv venv
-.env\Scriptsctivate
+.\venv\Scripts\activate
 ```
 
 #### macOS / Linux:
