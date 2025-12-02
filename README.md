@@ -302,3 +302,78 @@ This project helps you learn:
 - How to build a chatbot with memory  
 - How to build a RAG system  
 - How to structure a clean Python project  
+
+# 🧠 LangChain Agent Demo
+
+![Python](https://img.shields.io/badge/python-3.10%2B-blue.svg)
+![LangChain](https://img.shields.io/badge/langchain-1.x-ffca28.svg)
+![OpenAI](https://img.shields.io/badge/OpenAI_API-Enabled-412991.svg)
+![Status](https://img.shields.io/badge/status-Experimental-orange.svg)
+
+This project demonstrates a **minimal LangChain agent** that can call a Python tool (a simple calculator) using OpenAI’s GPT models.
+
+It is designed to be:
+- Interview-friendly  
+- Easy to explain  
+- Easy to modify  
+- A clean starting point for deeper agent development  
+
+---
+
+# 📘 Core Concepts (Simple Definitions)
+
+## 🔹 Large Language Model (LLM)
+A neural network (like GPT-4) that generates text, reasons about problems, and follows instructions.
+
+---
+
+## 🔹 LangChain
+A Python framework that makes it easy to build LLM applications by providing:
+- tools  
+- agents  
+- prompts  
+- memory  
+- chains  
+- integrations  
+
+Think of it as **the toolkit for connecting LLMs to real-world functionality**.
+
+---
+
+## 🔹 LangGraph
+A graph-based framework built on top of LangChain that lets you create **stateful, multi-step LLM agents**.
+
+Key features:
+- Deterministic agent flows  
+- Persistent state  
+- Tool orchestration  
+- Multi-agent systems  
+
+In simple terms:  
+➡️ **LangChain = components**  
+➡️ **LangGraph = control flow + agent brain**
+
+---
+
+## 🔹 LangSmith
+A debugging + evaluation platform for LLM applications.
+
+It allows you to:
+- trace agent runs  
+- inspect tool calls  
+- replay errors  
+- compare model outputs  
+
+Think of it as **“Observability for AI agents.”**
+
+---
+
+## 🔹 Tools
+Tools are **Python functions** that the model is allowed to call.
+
+Example:
+```python
+@tool
+def calculator(a: float, b: float) -> float:
+    """Add two numbers."""
+    return a + b
