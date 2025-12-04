@@ -54,7 +54,7 @@ if run_button:
 
         # 2. TL;DR
         with col2:
-            st.subheader("4. TL;DR")
+            st.subheader("4. Quick Summary")
             st.write(result.get("summary", "_No summary generated._"))
 
         st.markdown("---")
