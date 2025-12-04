@@ -7,7 +7,7 @@ It takes any technical topic and produces a structured, pedagogy-informed learni
 1. A level-appropriate explanation  
 2. Chunked learning sections  
 3. Retrieval-practice questions  
-4. A 1-sentence TL;DR summary  
+4. A 1-sentence quick summary  
 5. Meta-learning insights (chunking, cognitive load, analogies, etc.)
 
 ChunkBuddy is designed to feel like a “learning buddy” that understands cognitive science and breaks down complex topics into digestible mental units.
@@ -226,6 +226,9 @@ Evaluated for:
 
 LangSmith made iterative refinement straightforward.
 
+### 📸 Streamlit UI Preview
+![ChunkBuddy UI](./screenshot_ui_1.png)
+
 ---
 
 # 🧭 What I Learned
@@ -268,3 +271,33 @@ ChunkBuddy demonstrates:
 - A learning design grounded in cognitive science  
 
 This is a strong foundation for more advanced educational or tutoring agents.
+
+# 🧪 Evaluating with LangSmith (SDK)
+
+Run:
+
+```bash
+python evaluate_chunkbuddy.py
+This triggers:
+
+Dataset loading from LangSmith
+
+The ChunkBuddy graph execution for each example
+
+Three evaluators:
+
+Chunk count sanity check
+
+Question count sanity check
+
+LLM-as-judge clarity evaluation
+All results appear in LangSmith under an automatically generated experiment name.
+
+
+### Why I chose this agent design  
+I wanted a workflow that demonstrates the strengths of LangGraph:  
+a clear multi-step pipeline, state passing, deterministic edges, and modular nodes.  
+A learning assistant is naturally multi-stage (explain → chunk → question → summarize),  
+so it showcases LangGraph’s structure while being easy to reason about.  
+It also produces rich outputs, which makes LangSmith evaluation meaningful.
+
