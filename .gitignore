@@ -1,13 +1,6 @@
-# Virtual environment
 venv/
-
-# Environment variables
-.env
-
-# Python bytecode
+.mypy_cache/
 __pycache__/
+.env
 *.pyc
-
-# archive
-
-archive
+.DS_Store
