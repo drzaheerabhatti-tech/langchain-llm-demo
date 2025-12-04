@@ -25,6 +25,59 @@ ChunkBuddy was designed to:
 
 This creates a transparent, interpretable educational pipeline.
 
+
+# ⚡ Quickstart
+
+Follow these steps to run ChunkBuddy locally:
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/drzaheerabhatti-tech/langchain-llm-demo.git
+cd langchain-llm-demo/agent_demo
+```
+
+### 2. Create and activate a virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate      # macOS/Linux
+.\venv\Scripts\activate       # Windows
+```
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+### 4. Set your environment variables
+```bash
+Create a .env file in the same folder:
+OPENAI_API_KEY=your-openai-key-here
+LANGCHAIN_TRACING_V2=true
+LANGCHAIN_API_KEY=your-langsmith-key-here
+LANGCHAIN_PROJECT=chunkbuddy
+
+⚠️ .env is already in .gitignore, so keys won’t be committed.
+```
+
+### 5. Run the LangGraph agent (CLI mode)
+```bash
+python chunkbuddy_graph.py
+```
+### 6. Launch the Streamlit UI
+```bash
+streamlit run chunkbuddy_ui.py
+```
+### 7. Run LangSmith Evaluation
+```bash
+python evaluate_chunkbuddy.py
+
+You should now see:
+
+The LangGraph app running locally
+
+The Streamlit UI at http://localhost:8501
+
+LangSmith traces and evaluation results in your project dashboard (https://smith.langchain.com/)
+```
 ---
 
 ## 🧠 How ChunkBuddy Works
@@ -132,27 +185,6 @@ app = graph.compile()
 
 ---
 
-# 🧪 LangSmith Integration (Tracing & Debugging)
-
-Enable:
-
-```powershell
-$env:LANGCHAIN_TRACING_V2="true"
-$env:LANGCHAIN_API_KEY="<your-key>"
-$env:LANGCHAIN_PROJECT="chunkbuddy"
-```
-
-Every graph run appears as a full trace in LangSmith:
-
-- Node-by-node execution  
-- State transitions  
-- Prompts and outputs  
-- Latency and token cost  
-
-This provides deep observability for debugging complex agent workflows.
-
----
-
 # 🖥️ Streamlit UI
 ![Streamlit UI Screenshot](images/screenshot_ui_01.png)
 
@@ -173,10 +205,6 @@ Run the UI:
 ```bash
 streamlit run chunkbuddy_ui.py
 ```
-
-### 📸 Streamlit UI Screenshot
-*(Reference file: `screenshot_ui_01.png`)*
-
 ---
 
 # 🧪 LangSmith Evaluation Experiments
@@ -186,6 +214,14 @@ ChunkBuddy includes an automated evaluation script:
 ```bash
 python evaluate_chunkbuddy.py
 ```
+Every graph run appears as a full trace in LangSmith:
+
+- Node-by-node execution  
+- State transitions  
+- Prompts and outputs  
+- Latency and token cost  
+
+This provides deep observability for debugging complex agent workflows.
 
 Evaluators used:
 
@@ -205,6 +241,8 @@ This runs:
 ---
 
 # 📊 LangSmith Results Summary & Interpretation
+
+Traces appear in LangSmith under project: **chunkbuddy**
 
 ### 📸 Experiment Screenshot
 ![LangSmith Experiments](images/screenshot_ls_01.png)
@@ -234,19 +272,6 @@ Overall, this shows **high workflow consistency** across topics and levels.
 - LangSmith traces dramatically accelerate troubleshooting  
 - Streamlit is a fast way to demo LangGraph apps  
 - LangGraph + LangSmith is a strong developer experience combo  
-
----
-
----
-
-# 📦 Running in Script Mode
-
-```bash
-pip install langgraph langchain-openai langsmith streamlit
-python chunkbuddy_graph.py
-```
-
-Traces appear in LangSmith under project: **chunkbuddy**
 
 ---
 
