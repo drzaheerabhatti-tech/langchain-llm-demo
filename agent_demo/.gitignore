@@ -1,0 +1,94 @@
+# --------------------------------------
+# Python cache / temporary files
+# --------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+
+# --------------------------------------
+# Virtual environments
+# --------------------------------------
+venv/
+.env/
+.venv/
+env/
+
+# --------------------------------------
+# Secrets & environment variables
+# --------------------------------------
+# NEVER commit these
+.env
+.env.*
+*.env
+*.key
+*.secret
+
+# LangChain / LangSmith configuration
+langchain.env
+langsmith.env
+
+# --------------------------------------
+# Streamlit cache / logs
+# --------------------------------------
+.streamlit/
+**/.streamlit/
+
+# --------------------------------------
+# OS-specific junk files
+# --------------------------------------
+.DS_Store
+Thumbs.db
+
+# --------------------------------------
+# IDE & Editor settings
+# --------------------------------------
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --------------------------------------
+# Build and distribution
+# --------------------------------------
+build/
+dist/
+*.egg-info/
+
+# --------------------------------------
+# Backup or temp files created by editors
+# --------------------------------------
+*~
+*.tmp
+*.bak
+*.backup
+*.old
+
+# --------------------------------------
+# Jupyter notebook checkpoints
+# --------------------------------------
+.ipynb_checkpoints/
+
+# --------------------------------------
+# Logs
+# --------------------------------------
+*.log
+logs/
+
+# --------------------------------------
+# Generated markdown reports or artifacts
+# (optional — remove if you want to commit docs)
+# --------------------------------------
+/*.md.html
+
+# --------------------------------------
+# Model files / large data
+# --------------------------------------
+*.bin
+*.pkl
+*.pt
+*.onnx
+
+# --------------------------------------
+# User-specific files 
+# --------------------------------------
+*.personal
