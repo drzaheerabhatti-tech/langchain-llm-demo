@@ -78,19 +78,52 @@ python chunkbuddy_graph.py
 ```bash
 streamlit run chunkbuddy_ui.py
 ```
+The Streamlit UI at http://localhost:8501
+
 ### 7. Run LangSmith Evaluation
 ```bash
 python evaluate_chunkbuddy.py
 ```
-
-You should now see:
-
-The LangGraph app running locally
-
-The Streamlit UI at http://localhost:8501
-
 LangSmith traces and evaluation results in your project dashboard (https://smith.langchain.com/)
 
+### Workflow Architecture
+```
+          ┌───────────────────────┐
+          │   Dataset:            │
+          │   chunkbuddy-topics   │
+          │  (topics + levels)    │
+          └─────────┬─────────────┘
+                    │
+                    ▼
+          ┌───────────────────────┐
+          │   evaluate_chunkbuddy │
+          │   (batch runner)      │
+          │ - loads dataset       │
+          │ - builds state        │
+          │ - calls graph         │
+          │ - applies evaluators  │
+          └─────────┬─────────────┘
+                    │
+                    ▼
+          ┌───────────────────────┐
+          │   chunkbuddy_graph    │
+          │   (LangGraph logic)   │
+          │ - draft_explanation   │
+          │ - chunk_explanation   │
+          │ - generate_questions  │
+          │ - summarize_and_meta  │
+          └─────────┬─────────────┘
+                    │
+        ┌───────────┴───────────┐
+        ▼                       ▼
+┌───────────────────┐   ┌───────────────────────┐
+│ LangSmith results │   │     chunkbuddy_ui     │
+│ - clarity scores  │   │ - user enters topic   │
+│ - chunk counts    │   │ - calls graph once    │
+│ - question counts │   │ - shows explanation,  │
+│ - latency metrics │   │   chunks, questions   │
+└───────────────────┘   └───────────────────────┘
+```
 ---
 ## 🧠 How ChunkBuddy Works
 
