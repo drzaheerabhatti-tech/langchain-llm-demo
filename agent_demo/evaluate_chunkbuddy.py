@@ -13,8 +13,10 @@ Prereqs:
     - topic (string)
     - level (string: beginner / intermediate / advanced)
 """
-# Load environment variables first
 
+# --- Imports & environment bootstrap ----------------------------------------
+# We load environment variables first so API keys and project settings
+# are available to LangGraph and LangSmith.
 from typing import Dict, Any, List
 import json
 from langsmith import Client
@@ -25,16 +27,17 @@ from chunkbuddy_graph import build_app
 from load_env import load_env
 load_env()
 
-# Build the LangGraph app once
+# --- Build the LangGraph app ------------------------------------------------
+# We compile the ChunkBuddy graph once and reuse it for all dataset rows.
 app = build_app()
 
-# LangSmith client (not strictly needed for evaluate(), but handy if you want to inspect things)
+# LangSmith client (optional: useful if you want to inspect datasets,
+# experiments, or metadata directly).
 client = Client()
 
 # ---------------------------------------------------------------------------
 # Target function: how LangSmith calls your app
 # ---------------------------------------------------------------------------
-
 
 def chunkbuddy_target(inputs: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -43,15 +46,16 @@ def chunkbuddy_target(inputs: Dict[str, Any]) -> Dict[str, Any]:
     `inputs` will be one row from your dataset, e.g.:
         {"topic": "Kafka partitions", "level": "beginner"}
 
-    We invoke the LangGraph app and return a flat dict of outputs
-    that evaluators can inspect.
+    We invoke the LangGraph app with this state and return a flat dict
+    of outputs that evaluators can inspect.
     """
-
     topic = inputs["topic"]
     level = inputs.get("level", "beginner")
 
+    # Run the graph on this dataset row
     state = app.invoke({"topic": topic, "level": level})
 
+    # Return only the fields we want evaluators to check
     return {
         "raw_explanation": state.get("raw_explanation", ""),
         "chunks": state.get("chunks", []),
@@ -59,15 +63,13 @@ def chunkbuddy_target(inputs: Dict[str, Any]) -> Dict[str, Any]:
         "summary": state.get("summary", ""),
     }
 
-
 # ---------------------------------------------------------------------------
 # Simple rule-based evaluators
 # ---------------------------------------------------------------------------
 
-
 def chunk_count_ok(inputs: dict, outputs: dict) -> dict:
     """
-    Check that the number of chunks is in a reasonable range (3–7).
+    Evaluator: check that the number of chunks is in a reasonable range (3–7).
 
     Returns a dict with:
       - score: 1.0 if ok, 0.0 otherwise
@@ -77,42 +79,30 @@ def chunk_count_ok(inputs: dict, outputs: dict) -> dict:
     chunks: List[str] = outputs.get("chunks", [])
     n = len(chunks)
     score = 1.0 if 3 <= n <= 7 else 0.0
-    return {
-        "score": score,
-        "value": n,
-        "name": "chunk_count_ok",
-    }
-
+    return {"score": score, "value": n, "name": "chunk_count_ok"}
 
 def question_count_ok(inputs: dict, outputs: dict) -> dict:
     """
-    Check that the number of questions is in a reasonable range (3–7).
+    Evaluator: check that the number of questions is in a reasonable range (3–7).
     """
     questions: List[str] = outputs.get("check_questions", [])
     n = len(questions)
     score = 1.0 if 3 <= n <= 7 else 0.0
-    return {
-        "score": score,
-        "value": n,
-        "name": "question_count_ok",
-    }
-
+    return {"score": score, "value": n, "name": "question_count_ok"}
 
 # ---------------------------------------------------------------------------
-# LLM-as-judge evaluator for clarity vs level (no load_evaluator needed)
+# LLM-as-judge evaluator for clarity vs learner level
 # ---------------------------------------------------------------------------
-
+# Instead of a fixed rule, we ask a model to rate clarity on a 1–5 scale.
 eval_llm = ChatOpenAI(model="gpt-4o-mini")
-
 
 def clarity_for_level(inputs: dict, outputs: dict) -> dict:
     """
-    Use an LLM-as-judge to rate how clear the explanation is
+    Evaluator: use an LLM-as-judge to rate how clear the explanation is
     for the given learner level.
 
     We ask the model to return JSON like:
       {"score": 4, "reason": "..."}
-
     and parse it.
     """
     explanation = outputs.get("raw_explanation", "")
@@ -136,7 +126,6 @@ Respond ONLY as a JSON object with the following structure:
   "reason": "<short explanation of your rating>"
 }}
 """
-
     response = eval_llm.invoke(prompt)
     text = response.content
 
@@ -149,22 +138,18 @@ Respond ONLY as a JSON object with the following structure:
         score = 0.0
         reason = f"Could not parse JSON from response: {text}"
 
-    return {
-        "score": score,
-        "reason": reason,
-        "name": "clarity_for_level",
-    }
-
+    return {"score": score, "reason": reason, "name": "clarity_for_level"}
 
 # ---------------------------------------------------------------------------
 # Run the evaluation
 # ---------------------------------------------------------------------------
 
-
 if __name__ == "__main__":
     # Name of the dataset you created in LangSmith UI
     DATASET_NAME = "chunkbuddy-topics"
 
+    # Run evaluation: apply target function to dataset rows,
+    # then score outputs with evaluators.
     experiment_results = evaluate(
         chunkbuddy_target,
         data=DATASET_NAME,
