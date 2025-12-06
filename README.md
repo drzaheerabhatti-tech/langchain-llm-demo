@@ -26,7 +26,6 @@ Explore the full walkthrough, code, and evaluation results in [`agent_demo/READM
 - Showcase real-world LangGraph agents  
 - Demonstrate LangSmith evaluation workflows  
 - Build reusable components for agent development  
-- Share interpretable, well-documented examples for interviews and onboarding
 
 ---
 
