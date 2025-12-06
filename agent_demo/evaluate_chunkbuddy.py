@@ -13,15 +13,17 @@ Prereqs:
     - topic (string)
     - level (string: beginner / intermediate / advanced)
 """
+# Load environment variables first
 
 from typing import Dict, Any, List
 import json
-
 from langsmith import Client
 from langsmith.evaluation import evaluate
 from langchain_openai import ChatOpenAI
 
 from chunkbuddy_graph import build_app
+from load_env import load_env
+load_env()
 
 # Build the LangGraph app once
 app = build_app()

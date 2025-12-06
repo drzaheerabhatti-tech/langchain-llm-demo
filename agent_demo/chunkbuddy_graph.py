@@ -1,9 +1,13 @@
 # chunkbuddy_graph.py
+# Load environment variables first
 from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 
 from typing import TypedDict, List
 from langgraph.graph import StateGraph, START, END
+from load_env import load_env
+load_env()
+
 
 llm = ChatOpenAI(
     model="gpt-4o-mini",  # or "gpt-4o" if available to you

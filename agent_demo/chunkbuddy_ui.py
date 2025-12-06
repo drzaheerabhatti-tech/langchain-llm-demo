@@ -1,10 +1,10 @@
 # chunkbuddy_ui.py
-
 import streamlit as st
 from typing import TypedDict, List
 
 from chunkbuddy_graph import build_app, LearningState  # reuse your existing graph
-
+from load_env import load_env
+load_env()
 
 # Build the LangGraph app once at startup
 app = build_app()

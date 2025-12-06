@@ -57,6 +57,20 @@ LANGCHAIN_PROJECT=chunkbuddy
 
 ⚠️ .env is already in .gitignore, so keys won’t be committed.
 ```
+## 🔑 Environment Variable Loading (Important)
+
+This project uses **load_env.py** to ensure environment variables load correctly from `.env`.
+
+Place `.env` in `agent_demo/`:
+
+```
+agent_demo/
+    chunkbuddy_graph.py
+    chunkbuddy_ui.py
+    evaluate_chunkbuddy.py
+    load_env.py
+    .env
+```
 
 ### 5. Run the LangGraph agent (CLI mode)
 ```bash
@@ -69,6 +83,7 @@ streamlit run chunkbuddy_ui.py
 ### 7. Run LangSmith Evaluation
 ```bash
 python evaluate_chunkbuddy.py
+```
 
 You should now see:
 
@@ -77,9 +92,8 @@ The LangGraph app running locally
 The Streamlit UI at http://localhost:8501
 
 LangSmith traces and evaluation results in your project dashboard (https://smith.langchain.com/)
-```
----
 
+---
 ## 🧠 How ChunkBuddy Works
 
 ChunkBuddy is implemented as a **Directed Acyclic Graph (DAG)** in LangGraph:
