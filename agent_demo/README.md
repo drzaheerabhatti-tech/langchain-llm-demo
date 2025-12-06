@@ -49,7 +49,7 @@ pip install -r requirements.txt
 ```
 ### 4. Set your environment variables
 ```bash
-Create a .env file in the same folder:
+Create a .env file in the agent_demo folder:
 OPENAI_API_KEY=your-openai-key-here
 LANGCHAIN_TRACING_V2=true
 LANGCHAIN_API_KEY=your-langsmith-key-here
@@ -60,8 +60,6 @@ LANGCHAIN_PROJECT=chunkbuddy
 ## 🔑 Environment Variable Loading (Important)
 
 This project uses **load_env.py** to ensure environment variables load correctly from `.env`.
-
-Place `.env` in `agent_demo/`:
 
 ```
 agent_demo/
