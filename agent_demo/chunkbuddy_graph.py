@@ -13,12 +13,17 @@ from langchain_openai import ChatOpenAI
 from langchain_core.messages import HumanMessage
 from typing import TypedDict, List
 from langgraph.graph import StateGraph, START, END
+# import logging
+import re
 from load_env import load_env
 
 # Load API keys and other config from .env into process environment.
 # This happens once, at import time, so everything below can assume
 # OPENAI_API_KEY / LANGCHAIN_API_KEY are available.
 load_env()
+
+# logging.basicConfig(level=logging.DEBUG)
+# logger = logging.getLogger(__name__)
 
 # --- LLM configuration ------------------------------------------------------
 # Single shared LLM instance used by all graph nodes.
@@ -63,14 +68,18 @@ Topic: {topic}
 
 Requirements:
 - Use simple, clear language.
-- Keep it to one coherent explanation (around 2–4 short paragraphs).
+- Ensure that the total number of words in the explanation does not exceed 30 words.
 - Avoid unnecessary jargon, or explain it when you must use it.
-- Include at least one analogy or metaphor that makes the concept relatable.
 - Define technical terms the first time you use them.
+- Use a real-world metaphor (e.g., restaurant menu, delivery service) to explain the difference.
 - Aim to reduce cognitive load: focus on the core ideas first, details later.
 """
     response = llm.invoke([HumanMessage(content=prompt)])
     return {"raw_explanation": response.content}
+
+#- Include at least one analogy or metaphor that makes the concept relatable.
+#- You must include one analogy or metaphor that makes the concept relatable to a beginner.
+# - Keep it to one coherent explanation (around 2–4 short paragraphs).
 
 # --- Node 2: chunk_explanation ----------------------------------------------
 # Splits the explanation into 3–6 digestible chunks.
@@ -87,13 +96,16 @@ You are a learning coach.
 
 You will be given an explanation of a technical topic.
 
-Your job is to break it into 3–6 SHORT learning chunks that are easy for a beginner to digest.
+Your job is to break it into 4 SHORT learning chunks that are easy for a beginner to digest.
 
 Rules:
 - Each chunk should focus on ONE idea.
 - Each chunk should be 2–4 sentences.
 - Start each chunk with a title like: "Chunk 1: What a partition is"
 - Return ONLY the chunks, each as its own paragraph.
+
+- Here is the explanation to chunk: 
+{raw}
 """
     response = llm.invoke([HumanMessage(content=prompt)])
     # Simple parsing: split on blank lines
@@ -116,17 +128,48 @@ You are a learning coach helping someone understand a technical topic.
 
 You will be given several learning chunks that explain the topic step by step.
 
-Your job is to create 3–5 SHORT questions that help the learner check their understanding.
+Your job is to create 5 SHORT questions that help the learner check their understanding.
+
+Learning chunks:
+{chunks_text}
 """
     response = llm.invoke([HumanMessage(content=prompt)])
+    text = response.content
+
     # Parse numbered list into questions
     questions: List[str] = []
-    for line in response.content.splitlines():
+    num_pat = re.compile(r'^\s*\d+[\.\)\-]\s*(.+)$')
+    bullet_pat = re.compile(r'^\s*[\-\*]\s+(.+)$')
+
+    for line in text.splitlines():
         line = line.strip()
-        if line and line[0].isdigit():
-            q = line[2:].strip() if line[1] in [".", ")"] else line[3:].strip()
+        if not line:
+            continue
+        m= num_pat.match(line)
+        if m:
+            q = m.group(1).strip()
             if q:
                 questions.append(q)
+            continue
+        m = bullet_pat.match(line)
+        if m:
+            q = m.group(1).strip()
+            if q:
+                questions.append(q)
+            continue
+        if line.endswith("?"):
+            questions.append(line)
+
+    if not questions:
+        for c in chunks[:5]:  # cap at 5
+            title = c.split("\n", 1)[0].strip()  # e.g., "Chunk 3: Identity Verification"
+            title = title.removeprefix("Chunk ").split(":", 1)[-1].strip()  # "Identity Verification"
+            if title:
+                questions.append(f"What is {title.lower()}?")
+        # ensure unique and trimmed
+        questions = [q.strip() for q in questions if q.strip()]
+
+
     return {"check_questions": questions}
 
 # --- Node 4: summarize_and_meta ---------------------------------------------
@@ -140,19 +183,43 @@ def summarize_and_meta(state: LearningState) -> dict:
     chunks = state.get("chunks", [])
     questions = state.get("check_questions", [])
 
+    # Prepare compact context for the LLM
+    chunks_text = "\n".join(f"- {c.splitlines()[0]}" for c in chunks[:6])  # only titles for brevity
+    questions_text = "\n".join(f"- {q}" for q in questions[:5])
+
     prompt = f"""
 You are a learning scientist and technical explainer.
 
+Context:
+Topic: {topic}
+
+Raw explanation:
+{raw}
+
+Chunk titles:
+{chunks_text or "- (none)"}
+
+Check questions:
+{questions_text or "- (none)"}
+
 Tasks:
-1) Write a ONE-SENTENCE TL;DR summary of the topic.
-2) Write 2–3 bullets explaining how the structure supports learning.
+1) Write a ONE-SENTENCE TL;DR summary of the topic. Begin the line with exactly: "Summary:".
+2) Write 2–3 bullets explaining how the structure supports learning. Each bullet must start with "- ".
+
+Return only the summary line and the bullets.
 """
+
     response = llm.invoke([HumanMessage(content=prompt)])
     summary_line, bullets = "", []
+
     for line in response.content.splitlines():
-        if line.startswith("Summary:"):
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("Summary:") and not summary_line:
             summary_line = line[len("Summary:"):].strip()
-        elif line.startswith("- "):
+            continue
+        if line.startswith("- "):
             bullets.append(line[2:].strip())
 
     return {
