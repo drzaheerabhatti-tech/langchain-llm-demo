@@ -10,7 +10,7 @@ import streamlit as st
 from typing import TypedDict, List
 
 # Reuse the existing LangGraph app and state definition
-from chunkbuddy_graph import build_app, LearningState
+from chunkbuddy_standalone_graph import build_app, LearningState
 from load_env import load_env
 load_env()
 
