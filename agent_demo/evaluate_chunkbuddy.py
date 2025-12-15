@@ -23,7 +23,7 @@ from langsmith import Client
 from langsmith.evaluation import evaluate
 from langchain_openai import ChatOpenAI
 
-from chunkbuddy_graph import build_app
+from chunkbuddy_standalone_graph import build_app
 from load_env import load_env
 load_env()
 
